@@ -1,0 +1,26 @@
+# Beispiel-Unit fuer systemd.
+#   sudo cp fronius-emulator.service /etc/systemd/system/
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now fronius-emulator
+#
+# Pfade an die eigene Installation anpassen.
+
+[Unit]
+Description=Fronius Smart Meter Emulator (Shelly Pro 3EM)
+# network-online statt network: stellt sicher, dass beim Booten schon
+# eine IP vergeben ist, bevor der Shelly abgefragt wird.
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+ExecStart=/opt/shelly-fronius-meter/venv/bin/python /opt/shelly-fronius-meter/simulator.py
+WorkingDirectory=/opt/shelly-fronius-meter
+StandardOutput=journal
+StandardError=journal
+Restart=always
+RestartSec=10
+# Port 502 liegt unter 1024 und braucht daher Root-Rechte.
+User=root
+
+[Install]
+WantedBy=multi-user.target
